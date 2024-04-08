@@ -16,6 +16,7 @@ float sensorValue;  //variable to store sensor value
 
 String macAddress;
 const char* ssid = "MSetup"; // your ssid
+
 #define EAP_ID "Your Uniquename here"
 #define EAP_USERNAME "Your Uniquename Here"
 #define EAP_PASSWORD "Your Password Here"
@@ -24,10 +25,14 @@ String receiveTopic = "/response/"; //Base recieve topic
 String setupTopic = "/setup"; //Setup Topic
 
 
+
+
 const char* mqtt_server = "141.215.80.233"; // IP address or hostname of your MQTT broker
 const int mqtt_port = 1883; // MQTT broker port (usually 1883)
+
 String mqtt_username = "default"; //bcsotty
 String mqtt_password = "blaze"; //correct
+
 const char* mqtt_location = "None";
 
 bool receivedResponse = false; // Flag to track whether a response has been received
@@ -47,6 +52,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println(topic);
 
   Serial.print("Message payload: ");
+
   String resp = "";
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
@@ -57,6 +63,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // Convert the payload to an integer and store it
   response = atoi(resp.c_str());
 
+
   // Add your custom logic to handle the received integer value here
   Serial.print("Response from server: ");
   Serial.println(response);
@@ -64,7 +71,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // Add your custom logic to handle the received message here
   receivedResponse = true; // Set the flag to indicate that a response has been received
 }
-
 
 /*
 Author: Andrew Pearson
@@ -123,7 +129,9 @@ void setup() {
   pinMode(alarmOut, OUTPUT);
 
   
+
   //This allows us to connect to the UMICH server
+
   // WPA2 enterprise magic starts here
   WiFi.disconnect(true);      
   esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)EAP_ID, strlen(EAP_ID));
@@ -134,7 +142,9 @@ void setup() {
 
   WiFi.begin(ssid);
 
+
   //Connect to wifi
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("Connecting to WiFi...");
@@ -146,8 +156,10 @@ void setup() {
   client.setCallback(callback);
 
   Serial.println("Starting...");
+  
   // Obtain and print the MAC address
   // Mac address used for unique id
+
   macAddress = WiFi.macAddress();
   setupMQTT();
   Serial.print("MAC Address: ");
@@ -178,6 +190,7 @@ void reconnect() {
   }
 }
 
+
 /*
 Author: Andrew Pearson
 Description: Sleeps if a false alarm or if fire is no longer detected, sleep fire alarm
@@ -188,6 +201,7 @@ void sleepAlarm(){
   delay(2000); // set back to 60000
   checkFire();
 }
+
 
 /*
 Author: Andrew Pearson
@@ -280,13 +294,14 @@ void loop() {
     //client.disconnect(); // Disconnect if already connected
     reconnect();
   }
+
   client.loop();
   //client.loop();
 
   if(receivedResponse){
     waitForResponse(); // will move past loop because a response was received
   }
-  
+
   checkFire();
   delay(1000);
 
